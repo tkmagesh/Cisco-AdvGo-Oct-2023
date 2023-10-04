@@ -54,3 +54,27 @@
     - go run --race <app>
     - go build --race <app>
     - Note : DO NOT create production builds with race detector
+
+- Communication between goroutines (channels)
+    - Channel is a "data type"
+    - Declaration
+    ```
+        var <channel_variable> chan <data_type>
+        ex: var ch chan int
+    ```
+    - Initialize
+    ```
+        <channel_variable> = make(chan <data_type>)
+        ex: ch = make(chan int)
+    ```
+    - Channel Operations (using channle operator (<-) )
+        - Send Operation
+        ```
+            <channel_variable> <- <value>
+            ex: ch <- 100
+        ```
+        - Receive Operation
+        ```
+            <- <channel_variable>
+            ex: <- ch
+        ```
