@@ -50,6 +50,9 @@
     - sync package
     - sync/atomic package
 
+- Concurrency Model
+![image concurrency_model](./images/concurrency_model.png)
+
 - Race Detection
     - go run --race <app>
     - go build --race <app>
