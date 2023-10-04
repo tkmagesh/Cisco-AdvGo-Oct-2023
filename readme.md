@@ -22,3 +22,23 @@
 - Go Extension (VS Code) - https://marketplace.visualstudio.com/items?itemName=golang.Go
 - Docker Desktop
 
+
+
+## Go Basics ##
+- Language constructs
+- Collection Types (Array, Slice, Map)
+- Error handling 
+- Deferred functions
+- Higher Order Functions
+- Panic & Recovery
+- Interfaces
+- Modules & Packages
+
+- Structs
+- Concurrency
+
+## Struct ##
+- Value Types
+- Can be composed (No inheritence)
+
+
