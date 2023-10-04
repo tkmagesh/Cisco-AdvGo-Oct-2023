@@ -12,8 +12,8 @@ import (
 func main() {
 	nos := genFib()
 	for no := range nos {
-		time.Sleep(500 * time.Millisecond)
 		fmt.Println(no)
+		time.Sleep(500 * time.Millisecond)
 	}
 	fmt.Println("All the data received")
 }
@@ -27,13 +27,13 @@ func genFib() <-chan int {
 		for {
 			select {
 			case <-timeOutCh:
-				fmt.Println("Timeout occurred")
 				break LOOP
 			default:
 				fibCh <- x
 				x, y = y, x+y
 			}
 		}
+		fmt.Println("Timeout occurred")
 		close(fibCh)
 	}()
 	return fibCh
