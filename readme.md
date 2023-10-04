@@ -50,3 +50,7 @@
     - sync package
     - sync/atomic package
 
+- Race Detection
+    - go run --race <app>
+    - go build --race <app>
+    - Note : DO NOT create production builds with race detector
