@@ -78,3 +78,7 @@
             <- <channel_variable>
             ex: <- ch
         ```
+    - Channel Behavior
+        - Receive Operation is ALWAYS a blocking operation (operation is blocked until the data becomes available in the channel)
+        - Send Operation is blocked until a receive operation is initiated (conditional)
+    ![image channel_behaviors](./images/channel_behaviors.png)
