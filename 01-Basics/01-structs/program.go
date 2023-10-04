@@ -62,6 +62,9 @@ func main() {
 
 	productPtr.ApplyDiscount(10)
 	productPtr.Print()
+
+	var pPtr *Product
+	fmt.Println(pPtr)
 }
 
 /*
