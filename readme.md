@@ -41,4 +41,12 @@
 - Value Types
 - Can be composed (No inheritence)
 
+## Concurrency ##
+- What is Concurrency?
+    - Ability to have more than one execution path in an application
+- Support for concurrency is offered as a language feature (not thorugh APIs)
+    - go keyword, chan data type, chan operator (<-), range construct, select-case construct
+- Extensive API support
+    - sync package
+    - sync/atomic package
 
