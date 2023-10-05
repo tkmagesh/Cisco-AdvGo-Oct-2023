@@ -9,6 +9,11 @@ import (
 	"sync"
 )
 
+type ResultStats struct {
+	total int
+	count int
+}
+
 func main() {
 	fileWg := &sync.WaitGroup{}
 	processWg := &sync.WaitGroup{}
@@ -16,6 +21,8 @@ func main() {
 	dataCh := make(chan int)
 	oddCh := make(chan int)
 	evenCh := make(chan int)
+	oddSumCh := make(chan ResultStats)
+	evenSumCh := make(chan ResultStats)
 
 	fileWg.Add(1)
 	go Source("data1.dat", dataCh, fileWg)
@@ -26,10 +33,13 @@ func main() {
 	go Splitter(dataCh, evenCh, oddCh, processWg)
 
 	processWg.Add(1)
-	go Sum("Even-Total.txt", evenCh, processWg)
+	go Sum("Even-Total.txt", evenCh, evenSumCh, processWg)
 
 	processWg.Add(1)
-	go Sum("Odd-Total.txt", oddCh, processWg)
+	go Sum("Odd-Total.txt", oddCh, oddSumCh, processWg)
+
+	processWg.Add(1)
+	go Merger("result.txt", evenSumCh, oddSumCh, processWg)
 
 	fileWg.Wait()
 	close(dataCh)
@@ -68,7 +78,7 @@ func Splitter(ch chan int, evenCh chan int, oddCh chan int, wg *sync.WaitGroup) 
 	fmt.Println("counter :", counter)
 }
 
-func Sum(title string, ch chan int, wg *sync.WaitGroup) {
+func Sum(title string, ch chan int, sumCh chan ResultStats, wg *sync.WaitGroup) {
 	defer wg.Done()
 	total := 0
 	count := 0
@@ -77,13 +87,29 @@ func Sum(title string, ch chan int, wg *sync.WaitGroup) {
 		count += 1
 	}
 	fmt.Println(title, "total :", total, "count :", count)
-
+	result := ResultStats{
+		total: total,
+		count: count,
+	}
+	sumCh <- result
 	// refactor the following into the Merger() function so that both even sum & odd sum are written to the same file
 
-	file, err := os.Create(title)
+}
+
+func Merger(fileName string, evenSumCh, oddSumCh chan ResultStats, wg *sync.WaitGroup) {
+	defer wg.Done()
+	file, err := os.Create(fileName)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer file.Close()
-	fmt.Fprintf(file, "Total : %d\n", total)
+	for i := 0; i < 2; i++ {
+		select {
+		case evenResult := <-evenSumCh:
+			fmt.Fprintf(file, "Even Total : %d, Even Count : %d\n", evenResult.total, evenResult.count)
+		case oddResult := <-oddSumCh:
+			fmt.Fprintf(file, "Odd Total : %d, Odd Count : %d\n", oddResult.total, oddResult.count)
+		}
+	}
+
 }
