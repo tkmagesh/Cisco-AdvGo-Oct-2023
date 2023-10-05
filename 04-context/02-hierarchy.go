@@ -34,13 +34,29 @@ func fn(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 	fmt.Println("[fn] root-key :", ctx.Value("root-key"))
 
+	//overriding the value set in the parent (hierarchy) context
+	newRootValCtx := context.WithValue(ctx, "root-key", "new-root-value")
+
 	// context created to share data from "fn"
-	fnValCtx := context.WithValue(ctx, "fn-key", "fn-value")
-	wg.Add(1)
-	go f1(fnValCtx, wg)
+	fnValCtx := context.WithValue(newRootValCtx, "fn-key", "fn-value")
 
 	wg.Add(1)
-	go f2(fnValCtx, wg)
+	f1TimeoutCtx, f1Cancel := context.WithTimeout(fnValCtx, 5*time.Second)
+
+	defer func() {
+		fmt.Println("cancelling f1")
+		f1Cancel()
+	}()
+	go f1(f1TimeoutCtx, wg)
+
+	wg.Add(1)
+	f2TimeoutCtx, f2Cancel := context.WithTimeout(fnValCtx, 6*time.Second)
+	defer func() {
+		fmt.Println("cancelling f2")
+		f2Cancel()
+	}()
+	go f2(f2TimeoutCtx, wg)
+
 LOOP:
 	for {
 		select {
