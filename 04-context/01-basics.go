@@ -27,22 +27,35 @@ func main() {
 	*/
 
 	// combining explicit and time-based cancellation
-	ctx, cancel := context.WithTimeout(rootCtx, time.Second*10)
+	/*
+		ctx, cancel := context.WithTimeout(rootCtx, time.Second*10)
+		defer cancel()
+		fmt.Println("Hit ENTER to stop...")
+		go func() {
+			fmt.Scanln()
+			cancel()
+		}()
+	*/
+
+	// Using contexts to send data
+	cancelCtx, cancel := context.WithTimeout(rootCtx, time.Second*10)
 	defer cancel()
 	fmt.Println("Hit ENTER to stop...")
 	go func() {
 		fmt.Scanln()
 		cancel()
 	}()
+	valCtx := context.WithValue(cancelCtx, "key-1", "val-1")
 
 	wg.Add(1)
-	go fn(ctx, wg)
+	go fn(valCtx, wg)
 	wg.Wait()
 	fmt.Println("Done...!")
 }
 
 func fn(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
+	fmt.Println("key-1 :", ctx.Value("key-1"))
 LOOP:
 	for {
 		select {
