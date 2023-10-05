@@ -85,3 +85,7 @@
         - Receive Operation is ALWAYS a blocking operation (operation is blocked until the data becomes available in the channel)
         - Send Operation is blocked until a receive operation is initiated (conditional)
     ![image channel_behaviors](./images/channel_behaviors.png)
+    - Buffered Channel
+        - A "send" operation can be successful even if a "receive" operation is not initiated
+        - Use case:
+            "Receive" operation need to be optional

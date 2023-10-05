@@ -46,7 +46,8 @@ func ProcessData(dataCh chan int) <-chan struct{} {
 		processWg.Add(1)
 		go Merger("result.txt", evenSumCh, oddSumCh, processWg)
 		processWg.Wait()
-		close(doneCh)
+		// close(doneCh)
+		doneCh <- struct{}{}
 	}()
 	return doneCh
 }
