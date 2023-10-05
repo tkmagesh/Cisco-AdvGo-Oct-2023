@@ -26,10 +26,10 @@ func main() {
 	go Splitter(dataCh, evenCh, oddCh, processWg)
 
 	processWg.Add(1)
-	go Sum("Even Total :", evenCh, processWg)
+	go Sum("Even-Total.txt", evenCh, processWg)
 
 	processWg.Add(1)
-	go Sum("Odd Total :", oddCh, processWg)
+	go Sum("Odd-Total.txt", oddCh, processWg)
 
 	fileWg.Wait()
 	close(dataCh)
@@ -76,5 +76,14 @@ func Sum(title string, ch chan int, wg *sync.WaitGroup) {
 		total += val
 		count += 1
 	}
-	fmt.Println(title, "total ", total, "count :", count)
+	fmt.Println(title, "total :", total, "count :", count)
+
+	// refactor the following into the Merger() function so that both even sum & odd sum are written to the same file
+
+	file, err := os.Create(title)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
+	fmt.Fprintf(file, "Total : %d\n", total)
 }
