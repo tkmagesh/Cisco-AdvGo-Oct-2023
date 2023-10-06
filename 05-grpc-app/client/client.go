@@ -9,7 +9,9 @@ import (
 
 	proto "github.com/tkmagesh/cisco-advgo-oct-2023/05-grpc-app/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 func main() {
@@ -26,8 +28,11 @@ func main() {
 	// doRequestResponse(ctx, appServiceClient)
 	// doServerStreaming(ctx, appServiceClient)
 	// doClientStreaming(ctx, appServiceClient)
-	doneCh := doBiDiStreaming(ctx, appServiceClient)
-	<-doneCh
+	/*
+		doneCh := doBiDiStreaming(ctx, appServiceClient)
+		<-doneCh
+	*/
+	doRequestResponseWithTimeout(ctx, appServiceClient)
 }
 
 func doRequestResponse(ctx context.Context, appServiceClient proto.AppServiceClient) {
@@ -148,4 +153,24 @@ func recvResponse(ctx context.Context, clientStream proto.AppService_GreetClient
 		}
 		log.Println(res.GetMessage())
 	}
+}
+
+func doRequestResponseWithTimeout(ctx context.Context, appServiceClient proto.AppServiceClient) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	addReq := &proto.AddRequest{
+		X: 100,
+		Y: 200,
+	}
+
+	res, err := appServiceClient.Add(timeoutCtx, addReq)
+	if err != nil {
+		if code := status.Code(err); code == codes.DeadlineExceeded {
+			fmt.Println("timeout occurred")
+			return
+		}
+		log.Fatalln(err)
+	}
+	fmt.Printf("Result = %d\n", res.GetResult())
 }
