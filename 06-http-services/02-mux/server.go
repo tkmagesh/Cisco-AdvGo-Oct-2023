@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -81,11 +83,41 @@ func getOneProductHandler(w http.ResponseWriter, r *http.Request) {
 
 // customers
 func customersHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("req-key : ", r.Context().Value("req-key"))
 	fmt.Fprintln(w, "All the customers will be served")
+}
+
+// middlewares
+func logMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("%s - %s\n", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func profileMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		elapsed := time.Since(start)
+		fmt.Println("Time taken:", elapsed)
+	})
 }
 
 func main() {
 	router := mux.NewRouter()
+
+	//using the middleware
+	router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			valCtx := context.WithValue(r.Context(), "req-key", "req-value")
+			req := r.Clone(valCtx)
+			next.ServeHTTP(w, req)
+		})
+	})
+	router.Use(logMiddleware)
+	router.Use(profileMiddleware)
+
 	router.HandleFunc("/", indexHandler)
 	router.HandleFunc("/products/{id}", getOneProductHandler).Methods(http.MethodGet)
 	router.HandleFunc("/products", getProductsHandler).Methods(http.MethodGet)
