@@ -139,3 +139,9 @@
 - Platform API (net/http)
 - Using 3rd party "routing" libraries
 - Using 3rd party "web" frameworks
+
+# Benchmarking #
+- go test -bench=.
+
+# go command reference #
+- https://pkg.go.dev/cmd/go
