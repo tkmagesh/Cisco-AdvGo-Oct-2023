@@ -111,7 +111,7 @@ func main() {
 	router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			valCtx := context.WithValue(r.Context(), "req-key", "req-value")
-			req := r.Clone(valCtx)
+			req := r.WithContext(valCtx)
 			next.ServeHTTP(w, req)
 		})
 	})
