@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	proto "github.com/tkmagesh/cisco-advgo-oct-2023/05-grpc-app/proto"
 	"google.golang.org/grpc"
@@ -23,7 +24,8 @@ func main() {
 	ctx := context.Background()
 
 	// doRequestResponse(ctx, appServiceClient)
-	doServerStreaming(ctx, appServiceClient)
+	// doServerStreaming(ctx, appServiceClient)
+	doClientStreaming(ctx, appServiceClient)
 }
 
 func doRequestResponse(ctx context.Context, appServiceClient proto.AppServiceClient) {
@@ -66,4 +68,31 @@ func doServerStreaming(ctx context.Context, appServiceClient proto.AppServiceCli
 		fmt.Println("Prime No : ", primeResponse.GetPrimeNo())
 	}
 
+}
+
+func doClientStreaming(ctx context.Context, appServiceClient proto.AppServiceClient) {
+	data := []int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	var clientStream proto.AppService_CalculateAverageClient
+	clientStream, err := appServiceClient.CalculateAverage(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("Starting calculating the average")
+	for _, value := range data {
+		req := &proto.AverageRequest{
+			No: value,
+		}
+		fmt.Printf("Sending no : %d\n", value)
+		err := clientStream.Send(req)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	fmt.Println("Finished sending the data")
+	averageResponse, err := clientStream.CloseAndRecv()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Printf("Average : %d\n", averageResponse.GetResult())
 }

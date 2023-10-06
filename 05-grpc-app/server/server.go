@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"time"
@@ -53,6 +54,30 @@ func isPrime(no int32) bool {
 		}
 	}
 	return true
+}
+
+func (asi *AppServiceImpl) CalculateAverage(serverStream proto.AppService_CalculateAverageServer) error {
+	var sum, count int32
+	for {
+		req, err := serverStream.Recv()
+		if err == io.EOF {
+			fmt.Println("All the data received")
+			break
+		}
+		if err != nil {
+			return err
+		}
+		no := req.GetNo()
+		fmt.Println("Received No :", no)
+		count += 1
+		sum += no
+	}
+	avg := sum / count
+	res := &proto.AverageResponse{
+		Result: avg,
+	}
+	serverStream.SendAndClose(res)
+	return nil
 }
 
 func main() {
