@@ -16,6 +16,7 @@ func (appServer *AppServer) AddRoute(route string, handler func(http.ResponseWri
 }
 
 func (appServer *AppServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("%s - %s\n", r.Method, r.URL.Path)
 	route := r.URL.Path
 	if handler, ok := appServer.routes[route]; !ok {
 		w.WriteHeader(http.StatusNotFound)

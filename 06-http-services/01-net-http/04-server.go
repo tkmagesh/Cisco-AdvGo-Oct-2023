@@ -36,6 +36,7 @@ func NewAppServer() *AppServer {
 
 // handler
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("%s - %s\n", r.Method, r.URL.Path)
 	fmt.Fprintln(w, "Hello World!")
 }
 
@@ -52,6 +53,7 @@ var products = []Product{
 }
 
 func productsHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("%s - %s\n", r.Method, r.URL.Path)
 	switch r.Method {
 	case http.MethodGet:
 		w.Header().Set("Content-Type", "application/json")
@@ -76,6 +78,7 @@ func productsHandler(w http.ResponseWriter, r *http.Request) {
 
 // customers
 func customersHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("%s - %s\n", r.Method, r.URL.Path)
 	fmt.Fprintln(w, "All the customers will be served")
 }
 
