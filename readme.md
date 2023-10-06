@@ -134,3 +134,8 @@
             /server
             /proto
     ```
+
+# Http Services #
+- Platform API (net/http)
+- Using 3rd party "routing" libraries
+- Using 3rd party "web" frameworks
